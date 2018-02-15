@@ -1,0 +1,97 @@
+#!/bin/bash
+#####################to delete files when integer and string parameters are passed###############
+if [ "$#" -eq 2 ]; then
+if [ "$1" -eq "$1" >/dev/null ] && [ "$1" -ge 0 ]; then
+if [ -d "$2" ] && [ -w "$2" ]; then
+cd "$2"
+find . -maxdepth 1 -name '*.[0-9].log'| while read file; do
+fnum=$(echo "$file"|cut -c 3- | cut -f 2 -d ".")
+ffname=$(echo "$file"|cut -c 3-|cut -f 1 -d ".")
+if [ "$1" -ne 0 ] && [ "$fnum" -ge $1 ]; then
+rm $file
+fi
+if [ "$1" -eq 0 ] && [ "$fnum" -gt 0 ]; then
+rm $file
+fi 
+if [ "$fnum" -eq 0 ] && [ "$1" -eq 0 ]; then
+rm $file
+touch "$ffname".0.log
+fi
+done
+
+
+##################to update the filenames when integer and string parameters are passed###########
+count=$(find . -maxdepth 1 -name '*.[0-9].log'|wc -l) 
+find . -maxdepth 1 -name '*.[0-9].log'| sort -t '.' -k 2n -r | while read -r file; do
+fnum=$(echo "$file"|cut -c 3- | cut -f 2 -d ".")
+ffname=$(echo "$file"|cut -c 3-|cut -f 1 -d ".")
+if [ "$fnum" -ne 0 ]; then
+a=1
+mv $file ${ffname}.$(($fnum+$a)).log 
+fi
+if [ "$fnum" -eq 0 ] && [ "$1" -ne 0 ]; then
+b=1
+mv $file ${ffname}.$(($fnum+$b)).log 
+touch "$ffname".0.log
+fi
+done
+
+else
+echo "$2 must be a path to a log directory with write access for $USER"
+fi
+else
+echo "Number of days of logs to keep is required to be a non-negative integer"
+fi
+
+#################to delete older files when the number of arguments is 1#########################
+elif [ "$#" -eq 1 ]; then
+if [ "$1" -eq "$1" >/dev/null ] && [ "$1" -ge 0 ]; then
+find . -name logs -type d | grep '.*' > /dev/null
+z=$?
+if [ $z -eq 0 ]; then
+cd `find . -name logs -type d`
+find . -maxdepth 1 -name '*.[0-9].log'| while read file; do
+fnum=$(echo "$file"|cut -c 3- | cut -f 2 -d ".")
+ffname=$(echo "$file"|cut -c 3-|cut -f 1 -d ".")
+if [ "$1" -ne 0 ] && [ "$fnum" -ge $1 ]; then
+rm $file
+fi
+if [ "$1" -eq 0 ] && [ "$fnum" -gt 0 ]; then
+rm $file
+fi 
+if [ "$fnum" -eq 0 ] && [ "$1" -eq 0 ]; then
+rm $file
+touch "$ffname".0.log
+fi
+done
+
+
+##################to update filename when the number of arguments is 1###########################
+count=$(find . -maxdepth 1 -name '*.[0-9].log'|wc -l) 
+find . -maxdepth 1 -name '*.[0-9].log'| sort -t '.' -k 2n -r | while read -r file; do 
+ffname=$(echo "$file"|cut -c 3-|cut -f 1 -d ".")
+fnum=$(echo "$file"|cut -c 3- | cut -f 2 -d ".")
+if [ "$fnum" -ne 0 ]; then
+a=1
+mv $file ${ffname}.$(($fnum+$a)).log 
+fi
+
+if [ "$fnum" -eq 0 ] && [ "$1" -ne 0 ]; then
+b=1
+mv $file ${ffname}.$(($fnum+$b)).log 
+touch "$ffname".0.log
+fi
+
+done
+
+else
+echo "There are no logs directory available"
+fi
+else
+echo "Number of days of logs to keep is required to be a non-negative integer"
+fi
+
+else
+echo "Please check the arguments again"
+fi
+exit 0
