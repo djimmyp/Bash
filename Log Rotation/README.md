@@ -7,3 +7,5 @@ day.
 In order to keep these files accurate, the engineers will schedule a nightly process to rotate the logs.
 This rotation will increment the number in each file, and archive (or in our case, delete) any files older
 than a specified number of days. A new, empty, log file should also be created. Logs can have any name, but will always follow the pattern logtype.number.log where the number is the current age of the file.
+
+This application takes a required integer parameter, and an optional string parameter. The integer is the number of previous logs to keep, while the string is the path to the directory the logs are kept in (defaults to log). 
